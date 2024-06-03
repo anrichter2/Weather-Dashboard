@@ -8,19 +8,25 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
     crossorigin="anonymous">
 </head>
-<body>
-   <header>
-    <h1>Weather Dashboard</h1>
+<body class="container-fluid min-100-vh">
+   <header class="col-12 bg-primary ">
+        <h1>Weather Dashboard</h1>
    </header>
-   <main>
-    <aside>
-        <form>
-            <label>Search for a City:</label>
-            <input>
-            <button>Search</button>
+   <main class="d-flex flex-row">
+     <aside class="col-12 col-md-3">
+        <form id="city-input-form" class="flex-column p-2">
+            <label for="city-name">Search for a City:</label>
+            <input name="city-name" id="city-name" class="col-12 mb-2">
+            <button type="submit" form="city-input-form" class="btn btn-success col-12" id="submit-button">Search</button>
         </form>
-    </aside>
-    <section></section>
-   </main> 
+     </aside>
+     <div class="col-12 col-md-9">
+        <section id="today-weather-card" class="col-12"></section>
+        <section id="future-weather-cards col-12">
+          <h3>5-Day Forecast</h3>
+        </section>
+     </div>
+   </main>
+   <script src="./assets/js/script.js"></script>
 </body>
 </html>

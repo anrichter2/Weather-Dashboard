@@ -7,6 +7,7 @@ const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 
 const cityName = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
+const currentWeatherSec = document.getElementById('today-weather-card');
 
 function fetchGeoData(event) {
     event.preventDefault();
@@ -38,7 +39,7 @@ function fetchGeoData(event) {
 };
 
 function fetchCurrentWeatherData(latitude, longitude) {
-    const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}`
+    const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`
 
     fetch(baseCurrentWeatherAPI)
         .then(function(weatherCurrentResponse) {
@@ -47,13 +48,13 @@ function fetchCurrentWeatherData(latitude, longitude) {
 
         .then(function(weatherCurrentData) {
             console.log(weatherCurrentData);
-            createCurrentWeatherCard();
+            createCurrentWeatherCard(weatherCurrentData);
         })
 };
 
 function fetchFutureWeatherData(latitude, longitude) {
             
-    const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}`
+    const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`
             
     fetch(baseWeatherAPI)
         .then(function(weatherFutureResponse) {
@@ -67,12 +68,45 @@ function fetchFutureWeatherData(latitude, longitude) {
 
 };
 
-function createCurrentWeatherCard() {
-    let mainCardHeader = document.createElement('h2');
+function createCurrentWeatherCard(weatherCurrentData) {
+    //console.log(weatherCurrentData)
+    const currentCard = document.createElement('div');
+    currentCard.classList.add('card')
+    currentWeatherSec.appendChild(currentCard)
+
+    const mainCardHeader = document.createElement('div');
+    mainCardHeader.classList.add('card-header');
+    currentCard.appendChild(mainCardHeader);
+
+    const cityEl = document.createElement('p');
+    cityEl.classList.add('card-title');
+    cityEl.textContent = weatherCurrentData.name
+    mainCardHeader.appendChild(cityEl);
+
+    const cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+    currentCard.appendChild(cardBody);
+
+    const tempEl = document.createElement('p');
+    currentCard.classList.add('card-text');
+    tempEl.textContent = `Temperature: ${weatherCurrentData.main.temp}&#8457`
+    cardBody.appendChild(tempEl);
+
+    const windEl = document.createElement('p');
+    currentCard.classList.add('card-text');
+    windEl.textContent = `Wind speed: ${weatherCurrentData.main.humidity} MPH`
+    cardBody.appendChild(windEl);
+
+    const humidityEl = document.createElement('p');
+    currentCard.classList.add('card-text');
+    humidityEl.textContent = `Humidity: ${weatherCurrentData.main.humidity}%`
+    cardBody.appendChild(humidityEl);
+
 }
 
 function createFutureWeatherCards() {
-    let futureCardHeader = document.createElement('h3');
+    const futureCards = document.createElement('div')
+    const futureCardHeader = document.createElement('h3');
 }
 
 formSubmit.addEventListener('submit', fetchGeoData)

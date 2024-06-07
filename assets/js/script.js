@@ -8,7 +8,8 @@ const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 const cityName = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
 
-function fetchGeoData() {
+function fetchGeoData(event) {
+    event.preventDefault();
     
     let cityName = document.getElementById('city-name').value
     const geoCodingAPIURL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${weatherAPIKey}`;
@@ -25,32 +26,53 @@ function fetchGeoData() {
         
         .then(function (geoData) {
             console.log(geoData)
-            const latitude = geoData.lat
-            const longitude = geoData.lon
+            const latitude = geoData[0].lat
+            console.log(latitude) //Delete when done
+            const longitude = geoData[0].lon
+            console.log(longitude) //Delete when done
+            fetchCurrentWeatherData(latitude, longitude);
+            fetchFutureWeatherData(latitude, longitude);
             return latitude, longitude
         })
 
-    fetchWeatherData(latitude, longitude)
 };
 
-function fetchWeatherData(latitude, longitude) {
+function fetchCurrentWeatherData(latitude, longitude) {
+    const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}`
+
+    fetch(baseCurrentWeatherAPI)
+        .then(function(weatherCurrentResponse) {
+            return weatherCurrentResponse.json();
+        })
+
+        .then(function(weatherCurrentData) {
+            console.log(weatherCurrentData);
+            createCurrentWeatherCard();
+        })
+};
+
+function fetchFutureWeatherData(latitude, longitude) {
             
     const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}`
             
     fetch(baseWeatherAPI)
-        .then(function(weatherResponse) {
-            return weatherResponse.json();
+        .then(function(weatherFutureResponse) {
+            return weatherFutureResponse.json();
         })
 
-        .then(function(weatherData) {
-            createWeatherCards(weatherData)
+        .then(function(weatherFutureData) {
+            console.log(weatherFutureData)
+            createFutureWeatherCards(weatherFutureData)
         });
 
 };
 
-
-function createWeatherCards() {
-    let mainCardHeader = document.createElement('h3')
+function createCurrentWeatherCard() {
+    let mainCardHeader = document.createElement('h2');
 }
 
-formSubmit.addEventListener('submit', fetchGeoData())
+function createFutureWeatherCards() {
+    let futureCardHeader = document.createElement('h3');
+}
+
+formSubmit.addEventListener('submit', fetchGeoData)

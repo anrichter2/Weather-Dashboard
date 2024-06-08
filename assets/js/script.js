@@ -8,6 +8,7 @@ const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 const cityName = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
 const currentWeatherSec = document.getElementById('today-weather-card');
+const futureWeatherSec = document.getElementById('future-weather-cards');
 
 function fetchGeoData(event) {
     event.preventDefault();
@@ -39,7 +40,7 @@ function fetchGeoData(event) {
 };
 
 function fetchCurrentWeatherData(latitude, longitude) {
-    const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`
+    const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`;
 
     fetch(baseCurrentWeatherAPI)
         .then(function(weatherCurrentResponse) {
@@ -54,8 +55,9 @@ function fetchCurrentWeatherData(latitude, longitude) {
 
 function fetchFutureWeatherData(latitude, longitude) {
             
-    const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`
-            
+    const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`;
+    const baseFutureWeatherAPI = `api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt={cnt}&appid=${weatherAPIKey}`;
+
     fetch(baseWeatherAPI)
         .then(function(weatherFutureResponse) {
             return weatherFutureResponse.json();
@@ -63,7 +65,12 @@ function fetchFutureWeatherData(latitude, longitude) {
 
         .then(function(weatherFutureData) {
             console.log(weatherFutureData)
-            createFutureWeatherCards(weatherFutureData)
+            for (let i = 0; i < weatherFutureData.list.length; i++) {
+                if (i == 3 || 11 || 19 || 27 || 35) {
+                    console.log(weatherFutureData.list[i]);
+                    createFutureWeatherCards(weatherFutureData.list[i]);
+                };
+            };
         });
 
 };
@@ -71,14 +78,14 @@ function fetchFutureWeatherData(latitude, longitude) {
 function createCurrentWeatherCard(weatherCurrentData) {
     //console.log(weatherCurrentData)
     const currentCard = document.createElement('div');
-    currentCard.classList.add('card')
-    currentWeatherSec.appendChild(currentCard)
+    currentCard.classList.add('card');
+    currentWeatherSec.appendChild(currentCard);
 
     const mainCardHeader = document.createElement('div');
     mainCardHeader.classList.add('card-header');
     currentCard.appendChild(mainCardHeader);
 
-    const cityEl = document.createElement('p');
+    const cityEl = document.createElement('h3');
     cityEl.classList.add('card-title');
     cityEl.textContent = weatherCurrentData.name
     mainCardHeader.appendChild(cityEl);
@@ -88,25 +95,55 @@ function createCurrentWeatherCard(weatherCurrentData) {
     currentCard.appendChild(cardBody);
 
     const tempEl = document.createElement('p');
-    currentCard.classList.add('card-text');
-    tempEl.textContent = `Temperature: ${weatherCurrentData.main.temp}&#8457`
+    tempEl.classList.add('card-text');
+    tempEl.textContent = `Temperature: ${weatherCurrentData.main.temp} \u2109`
     cardBody.appendChild(tempEl);
 
     const windEl = document.createElement('p');
-    currentCard.classList.add('card-text');
-    windEl.textContent = `Wind speed: ${weatherCurrentData.main.humidity} MPH`
+    windEl.classList.add('card-text');
+    windEl.textContent = `Wind speed: ${weatherCurrentData.wind.speed} MPH`
     cardBody.appendChild(windEl);
 
     const humidityEl = document.createElement('p');
-    currentCard.classList.add('card-text');
+    humidityEl.classList.add('card-text');
     humidityEl.textContent = `Humidity: ${weatherCurrentData.main.humidity}%`
     cardBody.appendChild(humidityEl);
+};
 
-}
+function createFutureWeatherCards(weatherObject) {
+    const dateAndTime = weatherObject.dt_txt.split(' ');
+    const dateArray = dateAndTime[0].split('-');
+    const dateCorrectOrder = [dateArray[1], dateArray[2], dateArray[0]];
+    const finalDate = dateCorrectOrder.join('/');
+    console.log(finalDate); // DELETE when done
 
-function createFutureWeatherCards() {
-    const futureCards = document.createElement('div')
-    const futureCardHeader = document.createElement('h3');
-}
+    const futureCard = document.createElement('div');
+    futureCard.classList.add('card');
+    futureWeatherSec.appendChild(futureCard);
+
+    const cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+    futureCard.appendChild(cardBody);
+
+    const dateEl = document.createElement('h3');
+    dateEl.classList.add('card-title');
+    dateEl.textContent = finalDate;
+    cardBody.appendChild(dateEl);
+
+    const tempEl = document.createElement('p');
+    tempEl.classList.add('card-text');
+    tempEl.textContent = `Temperature: ${weatherObject.main.temp} \u2109`
+    cardBody.appendChild(tempEl);
+
+    const windEl = document.createElement('p');
+    windEl.classList.add('card-text');
+    windEl.textContent = `Wind speed: ${weatherObject.wind.speed} MPH`
+    cardBody.appendChild(windEl);
+
+    const humidityEl = document.createElement('p');
+    humidityEl.classList.add('card-text');
+    humidityEl.textContent = `Humidity: ${weatherObject.main.humidity}%`
+    cardBody.appendChild(humidityEl);
+};
 
 formSubmit.addEventListener('submit', fetchGeoData)

@@ -45,17 +45,20 @@ function getCityName(event) {
     fetchGeoData(cityName)
 };
 
-function handleButtonCity() {
+function handleButtonCity(cityName) {
 
     let previousSearches = JSON.parse(localStorage.getItem("searches"));
-    cityID = buttonEl.data
-    console.log(cityID)
 
-    for(let i = 0; i < previousSearches.length; i++) {
-        if (previousSearches[i] === cityID) {
-            fetchGeoData(cityID);
+    for (let i = 1; i < previousSearches.length; i++) {
+        if (cityName == previousSearches[i]) {
+            previousSearches.splice(i, 1);
+            previousSearches.unshift(cityName);
+            localStorage.setItem("searches", JSON.stringify(previousSearches));
         };
     };
+
+    renderPreviousSearches();
+    fetchGeoData(cityName);
 };
 
 function fetchGeoData(cityName) {
@@ -103,6 +106,7 @@ function fetchFutureWeatherData(latitude, longitude) {
             futureWeatherDiv.innerHTML = ""
             for (let i = 0; i < weatherFutureData.list.length; i++) {
                 if (i == 3 || i == 11 || i == 19 || i == 27 || i == 35) {
+                    console.log(weatherFutureData.list[i])
                     createFutureWeatherCards(weatherFutureData.list[i]);
                 };
             };
@@ -170,6 +174,18 @@ function createFutureWeatherCards(weatherObject) {
 
     forcastText.textContent = `5-Day Forecast`
 
+    if (weatherObject.weather[0].main == 'Clouds') {
+        weatherIcon = `⛅`
+    } else if (weatherObject.weather[0].main == 'Clear') {
+        weatherIcon = `☀`
+    } else if (weatherObject.weather[0].main == 'Rain') {
+        weatherIcon = `☔`
+    } else if (weatherObject.weather[0].main == 'Snow') {
+        weatherIcon = `🌨`
+    } else if (weatherObject.weather[0].main == 'Thunderstorm') {
+        weatherIcon = `🌩`
+    }
+
     const futureCard = document.createElement('div');
     futureCard.classList.add('card', 'col-2', 'text-bg-dark');
     futureWeatherDiv.appendChild(futureCard);
@@ -182,6 +198,10 @@ function createFutureWeatherCards(weatherObject) {
     dateEl.classList.add('card-title');
     dateEl.textContent = finalDate;
     cardBody.appendChild(dateEl);
+
+    const weatherIconEl = document.createElement('p');
+    weatherIconEl.textContent = weatherIcon;
+    cardBody.appendChild(weatherIconEl);
 
     const tempEl = document.createElement('p');
     tempEl.classList.add('card-text');
@@ -230,6 +250,6 @@ previousSearchDiv.addEventListener('click', function(event) {
     const element = event.target
     if (element.matches('button')) {
         cityName = element.textContent
-        fetchGeoData(cityName)
+        handleButtonCity(cityName)
     }
 });

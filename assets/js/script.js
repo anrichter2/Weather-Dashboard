@@ -1,6 +1,4 @@
-//TODO: get a weather API key
-// make function for displaying that weather information dynamically to the page
-// make a function for making a list of previous searches appear
+//TODO:
 // add event listeners for the search button and previous searches
 const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 
@@ -8,7 +6,8 @@ const cityInput = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
 const previousSearchDiv = document.getElementById('previous-search-target');
 const currentWeatherSec = document.getElementById('today-weather-card');
-const futureWeatherSec = document.getElementById('future-weather-cards');
+const forcastText = document.getElementById('forcast-text')
+const futureWeatherDiv = document.getElementById('future-weather-cards');
 
 function getCityName(event) {
     event.preventDefault();
@@ -44,7 +43,20 @@ function getCityName(event) {
 
     renderPreviousSearches()
     fetchGeoData(cityName)
-}
+};
+
+function handleButtonCity() {
+
+    let previousSearches = JSON.parse(localStorage.getItem("searches"));
+    cityID = buttonEl.data
+    console.log(cityID)
+
+    for(let i = 0; i < previousSearches.length; i++) {
+        if (previousSearches[i] === cityID) {
+            fetchGeoData(cityID);
+        };
+    };
+};
 
 function fetchGeoData(cityName) {
 
@@ -52,12 +64,10 @@ function fetchGeoData(cityName) {
     
     fetch(geoCodingAPIURL)
         .then(function (geoResponse) {
-            //console.log(geoResponse)
             return geoResponse.json();
         })
         
         .then(function (geoData) {
-            //console.log(geoData)
             const latitude = geoData[0].lat
             const longitude = geoData[0].lon
             fetchCurrentWeatherData(latitude, longitude);
@@ -75,7 +85,6 @@ function fetchCurrentWeatherData(latitude, longitude) {
         })
 
         .then(function(weatherCurrentData) {
-            //console.log(weatherCurrentData); //DELETE LATER
             createCurrentWeatherCard(weatherCurrentData);
         })
 };
@@ -91,8 +100,7 @@ function fetchFutureWeatherData(latitude, longitude) {
         })
 
         .then(function(weatherFutureData) {
-            //console.log(weatherFutureData) //DELETE LATER
-            futureWeatherSec.innerHTML = ""
+            futureWeatherDiv.innerHTML = ""
             for (let i = 0; i < weatherFutureData.list.length; i++) {
                 if (i == 3 || i == 11 || i == 19 || i == 27 || i == 35) {
                     createFutureWeatherCards(weatherFutureData.list[i]);
@@ -144,27 +152,29 @@ function createFutureWeatherCards(weatherObject) {
     const dateCorrectOrder = [dateArray[1], dateArray[2], dateArray[0]];
     const finalDate = dateCorrectOrder.join('/');
 
+    forcastText.textContent = `5-Day Forecast`
+
     const futureCard = document.createElement('div');
-    futureCard.classList.add('card');
-    futureWeatherSec.appendChild(futureCard);
+    futureCard.classList.add('card', 'col-2', 'text-bg-dark');
+    futureWeatherDiv.appendChild(futureCard);
 
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
     futureCard.appendChild(cardBody);
 
-    const dateEl = document.createElement('h3');
+    const dateEl = document.createElement('h4');
     dateEl.classList.add('card-title');
     dateEl.textContent = finalDate;
     cardBody.appendChild(dateEl);
 
     const tempEl = document.createElement('p');
     tempEl.classList.add('card-text');
-    tempEl.textContent = `Temperature: ${weatherObject.main.temp} \u2109`
+    tempEl.textContent = `Temp: ${weatherObject.main.temp} \u2109`
     cardBody.appendChild(tempEl);
 
     const windEl = document.createElement('p');
     windEl.classList.add('card-text');
-    windEl.textContent = `Wind speed: ${weatherObject.wind.speed} MPH`
+    windEl.textContent = `Wind: ${weatherObject.wind.speed} MPH`
     cardBody.appendChild(windEl);
 
     const humidityEl = document.createElement('p');
@@ -180,12 +190,12 @@ function renderPreviousSearches () {
         previousSearches = []
     }
 
-    //console.log(previousSearches)
-
     previousSearchDiv.innerHTML = ""
 
     for (let i = 0; i < previousSearches.length; i++) {
         const buttonEl = document.createElement('button');
+        buttonEl.classList.add('col-12', 'btn', 'btn-secondary', 'my-2')
+        buttonEl.setAttribute('data', `${previousSearches[i]}`)
         buttonEl.textContent = previousSearches[i];
         previousSearchDiv.appendChild(buttonEl);
     }
@@ -199,3 +209,11 @@ function init() {
 init()
 
 formSubmit.addEventListener('submit', getCityName)
+
+previousSearchDiv.addEventListener('click', function(event) {
+    event.preventDefault()
+    const element = event.target
+    if (element.matches('button')) {
+        handleButtonCity()
+    }
+});

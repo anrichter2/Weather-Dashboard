@@ -9,23 +9,24 @@
     crossorigin="anonymous">
 </head>
 <body class="container-fluid min-100-vh">
-   <header class="col-12 bg-primary my-2">
+   <header class="d-flex flex-row col-12 bg-info my-2 p-2 justify-content-end">
         <h1>Weather Dashboard</h1>
    </header>
    <main class="d-flex flex-row">
      <aside class="col-12 col-md-3">
         <form id="city-input-form" class="flex-column p-2">
-            <label for="city-name">Search for a City:</label>
-            <input name="city-name" id="city-name" class="col-12 mb-2">
+            <label for="city-name" class="fw-bold">Search for a City:</label>
+            <input name="city-name" id="city-name" placeholder="Minneapolis" class="col-12 mb-2">
             <button type="submit" form="city-input-form" class="btn btn-success col-12" id="submit-button">Search</button>
         </form>
         <hr />
-        <div id="previous-search-target"></div>
+        <div id="previous-search-target" class="d-flex flex-column"></div>
      </aside>
-     <div class="col-12 col-md-9">
+     <div class="col-12 col-md-9 mx-2">
         <section id="today-weather-card" class="col-12"></section>
-        <section id="future-weather-cards" class="col-12">
-          <h3>5-Day Forecast</h3>
+        <section class="col-12">
+          <h3 id="forcast-text"></h3>
+          <div id="future-weather-cards" class="d-flex flex-row justify-content-between"></div>
         </section>
      </div>
    </main>

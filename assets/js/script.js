@@ -23,7 +23,6 @@ function getCityName(event) {
     // if and for loops that determines how new searches are added or removed from local storage
     if (previousSearches.length == 0) {
         previousSearches.push(cityName);
-        console.log('hit');
         localStorage.setItem("searches", JSON.stringify(previousSearches));
     } else {
         previousSearches.unshift(cityName);
@@ -68,7 +67,7 @@ function handleButtonCity(cityName) {
 // Function that uses one openweathermap API to find the latitude and longitude location of a city the user inputs
 function fetchGeoData(cityName) {
 
-    const geoCodingAPIURL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${weatherAPIKey}`;
+    const geoCodingAPIURL = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${weatherAPIKey}`;
     
     fetch(geoCodingAPIURL)
         .then(function (geoResponse) {
@@ -80,8 +79,7 @@ function fetchGeoData(cityName) {
             const longitude = geoData[0].lon
             fetchCurrentWeatherData(latitude, longitude);
             fetchFutureWeatherData(latitude, longitude);
-        })
-
+        });
 };
 
 // Function that uses the latitude and longitude of a city to fetch current weather data
@@ -95,7 +93,7 @@ function fetchCurrentWeatherData(latitude, longitude) {
 
         .then(function(weatherCurrentData) {
             createCurrentWeatherCard(weatherCurrentData);
-        })
+        });
 };
 
 // Function that uses the latitude and longitude of a city to fetch future weather data
@@ -113,12 +111,10 @@ function fetchFutureWeatherData(latitude, longitude) {
             futureWeatherDiv.innerHTML = ""
             for (let i = 0; i < weatherFutureData.list.length; i++) {
                 if (i == 3 || i == 11 || i == 19 || i == 27 || i == 35) {
-                    console.log(weatherFutureData.list[i])
                     createFutureWeatherCards(weatherFutureData.list[i]);
                 };
             };
         });
-
 };
 
 // Function for creating a card that displays the current weather
@@ -138,7 +134,7 @@ function createCurrentWeatherCard(weatherCurrentData) {
         weatherIcon = `🌨`
     } else if (weatherCurrentData.weather[0].main == 'Thunderstorm') {
         weatherIcon = `🌩`
-    }
+    };
 
     currentWeatherSec.innerHTML = ""
 
@@ -152,7 +148,7 @@ function createCurrentWeatherCard(weatherCurrentData) {
 
     const cityEl = document.createElement('h3');
     cityEl.classList.add('card-title');
-    cityEl.textContent = weatherCurrentData.name + ` ${todaysDate}` + ` ${weatherIcon}`
+    cityEl.textContent = weatherCurrentData.name + ` ${todaysDate}` + ` ${weatherIcon}`;
     mainCardHeader.appendChild(cityEl);
 
     const cardBody = document.createElement('div');
@@ -161,17 +157,17 @@ function createCurrentWeatherCard(weatherCurrentData) {
 
     const tempEl = document.createElement('p');
     tempEl.classList.add('card-text');
-    tempEl.textContent = `Temperature: ${weatherCurrentData.main.temp} \u2109`
+    tempEl.textContent = `Temperature: ${weatherCurrentData.main.temp} \u2109`;
     cardBody.appendChild(tempEl);
 
     const windEl = document.createElement('p');
     windEl.classList.add('card-text');
-    windEl.textContent = `Wind speed: ${weatherCurrentData.wind.speed} MPH`
+    windEl.textContent = `Wind speed: ${weatherCurrentData.wind.speed} MPH`;
     cardBody.appendChild(windEl);
 
     const humidityEl = document.createElement('p');
     humidityEl.classList.add('card-text');
-    humidityEl.textContent = `Humidity: ${weatherCurrentData.main.humidity}%`
+    humidityEl.textContent = `Humidity: ${weatherCurrentData.main.humidity}%`;
     cardBody.appendChild(humidityEl);
 };
 
@@ -184,7 +180,7 @@ function createFutureWeatherCards(weatherObject) {
     const dateCorrectOrder = [dateArray[1], dateArray[2], dateArray[0]];
     const finalDate = dateCorrectOrder.join('/');
 
-    forcastText.textContent = `5-Day Forecast`
+    forcastText.textContent = `5-Day Forecast`;
 
     // If loop for determining which weather icon to display based on weather data
     if (weatherObject.weather[0].main == 'Clouds') {
@@ -197,7 +193,7 @@ function createFutureWeatherCards(weatherObject) {
         weatherIcon = `🌨`
     } else if (weatherObject.weather[0].main == 'Thunderstorm') {
         weatherIcon = `🌩`
-    }
+    };
 
     const futureCard = document.createElement('div');
     futureCard.classList.add('card', 'col-2', 'text-bg-dark');
@@ -266,5 +262,5 @@ previousSearchDiv.addEventListener('click', function(event) {
     if (element.matches('button')) {
         cityName = element.textContent
         handleButtonCity(cityName)
-    }
+    };
 });

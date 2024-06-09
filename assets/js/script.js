@@ -111,6 +111,22 @@ function fetchFutureWeatherData(latitude, longitude) {
 };
 
 function createCurrentWeatherCard(weatherCurrentData) {
+    const today = dayjs();
+    const todaysDate = today.format('MM/D/YYYY');
+    console.log(weatherCurrentData.weather[0].main)
+
+    if (weatherCurrentData.weather[0].main == 'Clouds') {
+        weatherIcon = `⛅`
+    } else if (weatherCurrentData.weather[0].main == 'Clear') {
+        weatherIcon = `☀`
+    } else if (weatherCurrentData.weather[0].main == 'Rain') {
+        weatherIcon = `☔`
+    } else if (weatherCurrentData.weather[0].main == 'Snow') {
+        weatherIcon = `🌨`
+    } else if (weatherCurrentData.weather[0].main == 'Thunderstorm') {
+        weatherIcon = `🌩`
+    }
+
     currentWeatherSec.innerHTML = ""
 
     const currentCard = document.createElement('div');
@@ -123,7 +139,7 @@ function createCurrentWeatherCard(weatherCurrentData) {
 
     const cityEl = document.createElement('h3');
     cityEl.classList.add('card-title');
-    cityEl.textContent = weatherCurrentData.name
+    cityEl.textContent = weatherCurrentData.name + ` ${todaysDate}` + ` ${weatherIcon}`
     mainCardHeader.appendChild(cityEl);
 
     const cardBody = document.createElement('div');
@@ -195,7 +211,6 @@ function renderPreviousSearches () {
     for (let i = 0; i < previousSearches.length; i++) {
         const buttonEl = document.createElement('button');
         buttonEl.classList.add('col-12', 'btn', 'btn-secondary', 'my-2')
-        buttonEl.setAttribute('data', `${previousSearches[i]}`)
         buttonEl.textContent = previousSearches[i];
         previousSearchDiv.appendChild(buttonEl);
     }
@@ -214,6 +229,7 @@ previousSearchDiv.addEventListener('click', function(event) {
     event.preventDefault()
     const element = event.target
     if (element.matches('button')) {
-        handleButtonCity()
+        cityName = element.textContent
+        fetchGeoData(cityName)
     }
 });

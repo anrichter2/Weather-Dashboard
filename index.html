@@ -9,7 +9,7 @@
     crossorigin="anonymous">
 </head>
 <body class="container-fluid min-100-vh">
-   <header class="col-12 bg-primary ">
+   <header class="col-12 bg-primary my-2">
         <h1>Weather Dashboard</h1>
    </header>
    <main class="d-flex flex-row">
@@ -19,6 +19,8 @@
             <input name="city-name" id="city-name" class="col-12 mb-2">
             <button type="submit" form="city-input-form" class="btn btn-success col-12" id="submit-button">Search</button>
         </form>
+        <hr />
+        <div id="previous-search-target"></div>
      </aside>
      <div class="col-12 col-md-9">
         <section id="today-weather-card" class="col-12"></section>

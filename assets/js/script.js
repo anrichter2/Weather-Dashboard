@@ -1,40 +1,67 @@
 //TODO: get a weather API key
-// make a function that fetches the lat and log of a city and then fetches weather data based on that log and lat
 // make function for displaying that weather information dynamically to the page
-// make a function for making a list of previous serches appear
+// make a function for making a list of previous searches appear
 // add event listeners for the search button and previous searches
 const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 
-const cityName = document.getElementById('city-name');
+const cityInput = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
+const previousSearchDiv = document.getElementById('previous-search-target');
 const currentWeatherSec = document.getElementById('today-weather-card');
 const futureWeatherSec = document.getElementById('future-weather-cards');
 
-function fetchGeoData(event) {
+function getCityName(event) {
     event.preventDefault();
     
-    let cityName = document.getElementById('city-name').value
+    let cityName = cityInput.value.trim()
+    let previousSearches = JSON.parse(localStorage.getItem("searches"));
+
+    if (previousSearches == null) {
+        previousSearches = []
+    };
+
+    if (previousSearches.length == 0) {
+        previousSearches.push(cityName);
+        console.log('hit');
+        localStorage.setItem("searches", JSON.stringify(previousSearches));
+    } else {
+        previousSearches.unshift(cityName);
+        localStorage.setItem("searches", JSON.stringify(previousSearches));
+        for (let i = 1; i < previousSearches.length; i++) {
+            if (previousSearches[0] == previousSearches[i]) {
+                previousSearches.splice(i, 1);
+                localStorage.setItem("searches", JSON.stringify(previousSearches));
+            }
+        };
+    };
+
+    if (previousSearches.length > 5) {
+        previousSearches.pop();
+        localStorage.setItem("searches", JSON.stringify(previousSearches));
+    };
+
+    cityInput.value = ""
+
+    renderPreviousSearches()
+    fetchGeoData(cityName)
+}
+
+function fetchGeoData(cityName) {
+
     const geoCodingAPIURL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${weatherAPIKey}`;
-    //const geoCodingAPIURL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName},{state code},{country code}&limit={limit}&appid=${weatherAPIKey}`
-    // use cnt parameter to control number of days
-    // can either just take the first value because it's based on popularity or I can add more input values to make it more complicated
-    // I can limit the number of previous results but Stephen says that I should leave a comment with my submition about the fact that I am limiting it for the grader
     
     fetch(geoCodingAPIURL)
         .then(function (geoResponse) {
-            console.log(geoResponse)
+            //console.log(geoResponse)
             return geoResponse.json();
         })
         
         .then(function (geoData) {
-            console.log(geoData)
+            //console.log(geoData)
             const latitude = geoData[0].lat
-            console.log(latitude) //Delete when done
             const longitude = geoData[0].lon
-            console.log(longitude) //Delete when done
             fetchCurrentWeatherData(latitude, longitude);
             fetchFutureWeatherData(latitude, longitude);
-            return latitude, longitude
         })
 
 };
@@ -48,7 +75,7 @@ function fetchCurrentWeatherData(latitude, longitude) {
         })
 
         .then(function(weatherCurrentData) {
-            console.log(weatherCurrentData);
+            //console.log(weatherCurrentData); //DELETE LATER
             createCurrentWeatherCard(weatherCurrentData);
         })
 };
@@ -64,10 +91,10 @@ function fetchFutureWeatherData(latitude, longitude) {
         })
 
         .then(function(weatherFutureData) {
-            console.log(weatherFutureData)
+            //console.log(weatherFutureData) //DELETE LATER
+            futureWeatherSec.innerHTML = ""
             for (let i = 0; i < weatherFutureData.list.length; i++) {
-                if (i == 3 || 11 || 19 || 27 || 35) {
-                    console.log(weatherFutureData.list[i]);
+                if (i == 3 || i == 11 || i == 19 || i == 27 || i == 35) {
                     createFutureWeatherCards(weatherFutureData.list[i]);
                 };
             };
@@ -76,7 +103,8 @@ function fetchFutureWeatherData(latitude, longitude) {
 };
 
 function createCurrentWeatherCard(weatherCurrentData) {
-    //console.log(weatherCurrentData)
+    currentWeatherSec.innerHTML = ""
+
     const currentCard = document.createElement('div');
     currentCard.classList.add('card');
     currentWeatherSec.appendChild(currentCard);
@@ -115,7 +143,6 @@ function createFutureWeatherCards(weatherObject) {
     const dateArray = dateAndTime[0].split('-');
     const dateCorrectOrder = [dateArray[1], dateArray[2], dateArray[0]];
     const finalDate = dateCorrectOrder.join('/');
-    console.log(finalDate); // DELETE when done
 
     const futureCard = document.createElement('div');
     futureCard.classList.add('card');
@@ -146,4 +173,29 @@ function createFutureWeatherCards(weatherObject) {
     cardBody.appendChild(humidityEl);
 };
 
-formSubmit.addEventListener('submit', fetchGeoData)
+function renderPreviousSearches () {
+    let previousSearches = JSON.parse(localStorage.getItem("searches"));
+
+    if (previousSearches == null) {
+        previousSearches = []
+    }
+
+    //console.log(previousSearches)
+
+    previousSearchDiv.innerHTML = ""
+
+    for (let i = 0; i < previousSearches.length; i++) {
+        const buttonEl = document.createElement('button');
+        buttonEl.textContent = previousSearches[i];
+        previousSearchDiv.appendChild(buttonEl);
+    }
+
+}
+
+function init() {
+    renderPreviousSearches();
+};
+
+init()
+
+formSubmit.addEventListener('submit', getCityName)

@@ -1,7 +1,7 @@
-//TODO:
-// add event listeners for the search button and previous searches
+// Weather API key for OpenWeatherMap API
 const weatherAPIKey = `a83f7466cca6e6eb8fab0e903c110044`;
 
+// Element Selectors
 const cityInput = document.getElementById('city-name');
 const formSubmit = document.getElementById('city-input-form');
 const previousSearchDiv = document.getElementById('previous-search-target');
@@ -9,6 +9,7 @@ const currentWeatherSec = document.getElementById('today-weather-card');
 const forcastText = document.getElementById('forcast-text')
 const futureWeatherDiv = document.getElementById('future-weather-cards');
 
+// Function that takes the inputed city name and saves it to local storage, clears the city input, and then calls the render and fetchGeo functions
 function getCityName(event) {
     event.preventDefault();
     
@@ -19,6 +20,7 @@ function getCityName(event) {
         previousSearches = []
     };
 
+    // if and for loops that determines how new searches are added or removed from local storage
     if (previousSearches.length == 0) {
         previousSearches.push(cityName);
         console.log('hit');
@@ -34,6 +36,7 @@ function getCityName(event) {
         };
     };
 
+    // Puts a limit on how many previous searches can be in local storage so that the list doesn't keep growing infinitly
     if (previousSearches.length > 5) {
         previousSearches.pop();
         localStorage.setItem("searches", JSON.stringify(previousSearches));
@@ -45,6 +48,7 @@ function getCityName(event) {
     fetchGeoData(cityName)
 };
 
+// Function for updating local storage when one of the previous search buttons are clicked
 function handleButtonCity(cityName) {
 
     let previousSearches = JSON.parse(localStorage.getItem("searches"));
@@ -61,6 +65,7 @@ function handleButtonCity(cityName) {
     fetchGeoData(cityName);
 };
 
+// Function that uses one openweathermap API to find the latitude and longitude location of a city the user inputs
 function fetchGeoData(cityName) {
 
     const geoCodingAPIURL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&appid=${weatherAPIKey}`;
@@ -79,6 +84,7 @@ function fetchGeoData(cityName) {
 
 };
 
+// Function that uses the latitude and longitude of a city to fetch current weather data
 function fetchCurrentWeatherData(latitude, longitude) {
     const baseCurrentWeatherAPI = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`;
 
@@ -92,16 +98,17 @@ function fetchCurrentWeatherData(latitude, longitude) {
         })
 };
 
+// Function that uses the latitude and longitude of a city to fetch future weather data
 function fetchFutureWeatherData(latitude, longitude) {
             
     const baseWeatherAPI = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${weatherAPIKey}&units=imperial`;
-    const baseFutureWeatherAPI = `api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt={cnt}&appid=${weatherAPIKey}`;
 
     fetch(baseWeatherAPI)
         .then(function(weatherFutureResponse) {
             return weatherFutureResponse.json();
         })
 
+        // This .then clears the elements from the future weather card section and the if loop selects data that is 24 hours apart so it shows data from 5 different days
         .then(function(weatherFutureData) {
             futureWeatherDiv.innerHTML = ""
             for (let i = 0; i < weatherFutureData.list.length; i++) {
@@ -114,11 +121,13 @@ function fetchFutureWeatherData(latitude, longitude) {
 
 };
 
+// Function for creating a card that displays the current weather
 function createCurrentWeatherCard(weatherCurrentData) {
+    // Dayjs for displaying the current date on the current weather card
     const today = dayjs();
     const todaysDate = today.format('MM/D/YYYY');
-    console.log(weatherCurrentData.weather[0].main)
 
+    // If loop for determining which weather icon to display based on weather data
     if (weatherCurrentData.weather[0].main == 'Clouds') {
         weatherIcon = `⛅`
     } else if (weatherCurrentData.weather[0].main == 'Clear') {
@@ -166,7 +175,10 @@ function createCurrentWeatherCard(weatherCurrentData) {
     cardBody.appendChild(humidityEl);
 };
 
+// Function for creating future weather cards
 function createFutureWeatherCards(weatherObject) {
+
+    // Determines the date that the weather data is from
     const dateAndTime = weatherObject.dt_txt.split(' ');
     const dateArray = dateAndTime[0].split('-');
     const dateCorrectOrder = [dateArray[1], dateArray[2], dateArray[0]];
@@ -174,6 +186,7 @@ function createFutureWeatherCards(weatherObject) {
 
     forcastText.textContent = `5-Day Forecast`
 
+    // If loop for determining which weather icon to display based on weather data
     if (weatherObject.weather[0].main == 'Clouds') {
         weatherIcon = `⛅`
     } else if (weatherObject.weather[0].main == 'Clear') {
@@ -219,6 +232,7 @@ function createFutureWeatherCards(weatherObject) {
     cardBody.appendChild(humidityEl);
 };
 
+// Function for rendering buttons on the screen based of the users previous searches
 function renderPreviousSearches () {
     let previousSearches = JSON.parse(localStorage.getItem("searches"));
 
@@ -233,16 +247,17 @@ function renderPreviousSearches () {
         buttonEl.classList.add('col-12', 'btn', 'btn-secondary', 'my-2')
         buttonEl.textContent = previousSearches[i];
         previousSearchDiv.appendChild(buttonEl);
-    }
+    };
+};
 
-}
-
+// initial function that runs when the webpage is first loaded
 function init() {
     renderPreviousSearches();
 };
 
 init()
 
+// Event listeners for the user submiting a city name via the form or by clicking a previous search button
 formSubmit.addEventListener('submit', getCityName)
 
 previousSearchDiv.addEventListener('click', function(event) {

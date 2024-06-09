@@ -10,11 +10,11 @@ N/A
 
 ## Usage
 
-Below are screenshots showing my blog website.
+Below are screenshots showing my weather dashboard website.
 
-![Weather Display Before Searches]()
+![Weather Display Before Searches](assets/images/weather-dashboard-before-search.png)
 
-![Weather Display After a Search](assets/images/Blog-Image-2.png)
+![Weather Display After a Search](assets/images/weather-dashboard-after-search.png)
 
 Link to the deployed webpage
 [My Weather Dashboard](https://anrichter2.github.io/Weather-Dashboard/)
